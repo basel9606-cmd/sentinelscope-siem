@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SentinelScope | SIEM Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark">S</span><span>Sentinel<span>Scope</span></span></div>
+      <nav aria-label="Primary navigation">
+        <a class="nav-item active" href="#overview"><span>▦</span> Overview</a>
+        <a class="nav-item" href="#alerts"><span>◉</span> Alerts <b id="navAlertCount">0</b></a>
+        <a class="nav-item" href="#events"><span>≡</span> Event Explorer</a>
+        <a class="nav-item" href="#detections"><span>⌁</span> Detections</a>
+      </nav>
+      <div class="sidebar-footer"><span class="status-dot"></span> Telemetry healthy<br /><small>Last ingest: just now</small></div>
+    </aside>
+
+    <main>
+      <header>
+        <div><p class="eyebrow">SECURITY OPERATIONS CENTER</p><h1>Threat overview</h1><p class="subhead">Monday, 31 August 2026 · Production environment</p></div>
+        <div class="header-actions"><button class="secondary" id="refreshBtn">↻ Refresh</button><button class="primary" id="newCaseBtn">+ New case</button><div class="analyst">AM</div></div>
+      </header>
+
+      <section id="overview" class="metrics" aria-label="Security metrics">
+        <article class="metric-card"><p>Open alerts</p><strong id="openAlerts">0</strong><span class="trend alert-trend">↑ 18% <em>vs. last 24h</em></span></article>
+        <article class="metric-card"><p>Critical alerts</p><strong id="criticalAlerts">0</strong><span class="trend neutral">Requires immediate review</span></article>
+        <article class="metric-card"><p>Events processed</p><strong id="eventCount">0</strong><span class="trend good">↑ 12.4% <em>vs. last 24h</em></span></article>
+        <article class="metric-card"><p>Mean time to acknowledge</p><strong>8m 14s</strong><span class="trend good">↓ 22% <em>vs. last week</em></span></article>
+      </section>
+
+      <section class="grid">
+        <article class="panel chart-panel"><div class="panel-heading"><div><h2>Security events</h2><p>Ingested events over the last 24 hours</p></div><select id="chartRange" aria-label="Chart range"><option>24 hours</option><option>7 days</option></select></div><div class="chart" aria-label="Area chart of event volume"><div class="chart-grid"></div><svg id="eventChart" viewBox="0 0 700 190" preserveAspectRatio="none"><defs><linearGradient id="fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#4c8dff" stop-opacity=".35"/><stop offset="100%" stop-color="#4c8dff" stop-opacity="0"/></linearGradient></defs><path id="areaPath" fill="url(#fill)"/><path id="linePath" fill="none" stroke="#66a0ff" stroke-width="3" stroke-linejoin="round"/></svg><div class="chart-labels"><span>00:00</span><span>04:00</span><span>08:00</span><span>12:00</span><span>16:00</span><span>20:00</span><span>Now</span></div></div></article>
+        <article class="panel posture-panel"><div class="panel-heading"><div><h2>Security posture</h2><p>Current environment health</p></div><button class="icon-button" aria-label="More options">•••</button></div><div class="posture-score"><div class="ring"><span>78</span><small>/100</small></div><div><b>Needs attention</b><p>3 high-priority actions are pending.</p></div></div><ul class="posture-list"><li><span class="dot critical"></span><div><b>2 critical alerts</b><small>Review and contain active threats</small></div><span>›</span></li><li><span class="dot warning"></span><div><b>6 assets need patching</b><small>CVEs detected in endpoint inventory</small></div><span>›</span></li><li><span class="dot good-dot"></span><div><b>EDR coverage: 96%</b><small>192 of 200 endpoints reporting</small></div><span>›</span></li></ul></article>
+      </section>
+
+      <section id="alerts" class="panel alert-panel"><div class="panel-heading"><div><h2>Priority alerts</h2><p>Detection findings requiring analyst review</p></div><a href="#events">View all events →</a></div><div class="filters"><div class="search-wrap">⌕ <input id="searchInput" type="search" placeholder="Search alerts, users, IPs…" /></div><select id="severityFilter"><option value="all">All severities</option><option value="critical">Critical</option><option value="high">High</option><option value="medium">Medium</option></select><select id="statusFilter"><option value="all">All statuses</option><option value="new">New</option><option value="investigating">Investigating</option><option value="resolved">Resolved</option></select></div><div class="table-wrap"><table><thead><tr><th>SEVERITY</th><th>ALERT</th><th>ENTITY</th><th>MITRE ATT&CK</th><th>TIME</th><th>STATUS</th><th></th></tr></thead><tbody id="alertRows"></tbody></table></div><p id="emptyState" class="empty" hidden>No alerts match the current filters.</p></section>
+
+      <section id="detections" class="bottom-grid"><article class="panel"><div class="panel-heading"><div><h2>Detection coverage</h2><p>Rules triggered in this period</p></div></div><div id="coverageList" class="coverage-list"></div></article><article id="events" class="panel"><div class="panel-heading"><div><h2>Recent normalized events</h2><p>Latest telemetry across monitored sources</p></div></div><div id="eventList" class="event-list"></div></article></section>
+    </main>
+    <div id="toast" class="toast" role="status"></div>
+    <script src="assets/js/app.js"></script>
+  </body>
+</html>
