@@ -1,0 +1,5 @@
+[
+  {"id":"ALT-4821","rule":"C2 Beaconing Detection","severity":"critical","mitre":"T1071.001","entity":"WS-FIN-023","status":"new"},
+  {"id":"ALT-4819","rule":"Impossible Travel","severity":"critical","mitre":"T1078","entity":"n.levy@contoso.io","status":"investigating"},
+  {"id":"ALT-4817","rule":"Brute Force Followed by Success","severity":"high","mitre":"T1110","entity":"svc-backup","status":"new"}
+]

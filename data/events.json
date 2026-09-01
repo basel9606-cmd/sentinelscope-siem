@@ -1,0 +1,6 @@
+[
+  {"timestamp":"2026-08-31T09:42:18Z","source":"windows-security","host":"WIN-DC01","event_id":4625,"user":"svc-backup","action":"logon_failure","source_ip":"10.10.14.37","severity":"medium"},
+  {"timestamp":"2026-08-31T09:41:53Z","source":"firewall","host":"FW-EDGE-01","action":"connection_blocked","destination_ip":"185.220.101.42","destination_port":443,"severity":"high"},
+  {"timestamp":"2026-08-31T09:41:15Z","source":"endpoint-edr","host":"WS-FIN-023","action":"process_create","process":"powershell.exe -enc SQBFAFgA","user":"n.levy","severity":"high"},
+  {"timestamp":"2026-08-31T09:39:02Z","source":"azure-ad","user":"n.levy@contoso.io","action":"sign_in","location":"Singapore","previous_location":"Tel Aviv","severity":"high"}
+]
