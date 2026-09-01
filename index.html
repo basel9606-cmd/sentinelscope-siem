@@ -66,13 +66,13 @@
       <div class="drawer-actions"><button id="statusAction" class="primary">Start investigation</button><button id="closeAction" class="secondary">Close as resolved</button></div>
     </aside><div id="drawerScrim" class="drawer-scrim"></div>
     <section id="authDialog" class="auth-dialog" role="dialog" aria-modal="true" aria-labelledby="authTitle" hidden>
-      <form id="authForm" class="auth-card"><p class="eyebrow">ANALYST ACCESS</p><h2 id="authTitle">Sign in to SentinelScope</h2><p>We will send a secure one-time sign-in link to your email.</p><label>Email address<input id="authEmail" type="email" autocomplete="email" placeholder="analyst@company.com" required /></label><p id="authMessage" class="auth-message" role="status"></p><div class="auth-actions"><button id="authCancel" type="button" class="secondary">Cancel</button><button type="submit" class="primary">Send secure link</button></div></form>
+      <form id="authForm" class="auth-card"><p class="eyebrow">ANALYST ACCESS</p><h2 id="authTitle">Sign in to SentinelScope</h2><p>Use GitHub for the fastest secure sign-in, or request a link by email.</p><button id="githubSignIn" type="button" class="primary">Continue with GitHub</button><label>Email address<input id="authEmail" type="email" autocomplete="email" placeholder="analyst@company.com" required /></label><p id="authMessage" class="auth-message" role="status"></p><div class="auth-actions"><button id="authCancel" type="button" class="secondary">Cancel</button><button type="submit" class="primary">Send secure link</button></div></form>
     </section>
     <div id="toast" class="toast" role="status"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="assets/js/supabase-config.js?v=20260901"></script>
     <script src="assets/js/app.js?v=20260901.2"></script>
-    <script src="assets/js/supabase-client.js?v=20260902"></script>
+    <script src="assets/js/supabase-client.js?v=20260903"></script>
     <script src="assets/js/starter.js?v=20260901.2"></script>
     <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js');</script>
   </body>

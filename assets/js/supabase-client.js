@@ -18,6 +18,10 @@
   });
 
   document.querySelector('#authCancel').addEventListener('click', () => { authDialog.hidden = true; });
+  document.querySelector('#githubSignIn').addEventListener('click', async () => {
+    const { error } = await client.auth.signInWithOAuth({ provider: 'github', options: { redirectTo: `${window.location.origin}${window.location.pathname}` } });
+    if (error) { authMessage.textContent = `GitHub sign-in error: ${error.message}`; authMessage.className = 'auth-message error'; }
+  });
   authForm.addEventListener('submit', async event => {
     event.preventDefault();
     const { error } = await client.auth.signInWithOtp({ email: authEmail.value.trim(), options: { emailRedirectTo: `${window.location.origin}${window.location.pathname}` } });

@@ -1,4 +1,4 @@
-const CACHE = 'sentinelscope-v3';
+const CACHE = 'sentinelscope-v4';
 const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './assets/css/styles.css', './assets/css/professional.css', './assets/js/app.js', './assets/js/starter.js', './assets/js/supabase-config.js', './assets/js/supabase-client.js', './assets/icons/sentinel.svg'];
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting())));
 self.addEventListener('activate', event => event.waitUntil(self.clients.claim()));
