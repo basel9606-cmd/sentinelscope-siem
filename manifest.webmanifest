@@ -1,0 +1,12 @@
+{
+  "name": "SentinelScope SIEM",
+  "short_name": "SentinelScope",
+  "description": "SOC analyst SIEM investigation workbench",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#111a2d",
+  "theme_color": "#111a2d",
+  "icons": [
+    { "src": "assets/icons/sentinel.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
