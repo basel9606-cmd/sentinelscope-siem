@@ -9,6 +9,7 @@
   const authForm = document.querySelector('#authForm');
   const authEmail = document.querySelector('#authEmail');
   const authMessage = document.querySelector('#authMessage');
+  const authRedirectUrl = `${window.location.origin}${window.location.pathname}?release=20260903-auth`;
   function setSignedOut() { window.SentinelScope.session = null; authButton.textContent = 'Sign in'; analystBadge.textContent = '—'; analystBadge.title = 'Sign in to access protected cases'; }
   function setSignedIn(session) { const email = session.user.email || 'Analyst'; window.SentinelScope.session = session; authButton.textContent = 'Sign out'; analystBadge.textContent = email.slice(0, 2).toUpperCase(); analystBadge.title = `Signed in as ${email}`; }
   async function refreshSession() { const { data } = await client.auth.getSession(); data.session ? setSignedIn(data.session) : setSignedOut(); return data.session; }
@@ -19,12 +20,12 @@
 
   document.querySelector('#authCancel').addEventListener('click', () => { authDialog.hidden = true; });
   document.querySelector('#githubSignIn').addEventListener('click', async () => {
-    const { error } = await client.auth.signInWithOAuth({ provider: 'github', options: { redirectTo: `${window.location.origin}${window.location.pathname}` } });
+    const { error } = await client.auth.signInWithOAuth({ provider: 'github', options: { redirectTo: authRedirectUrl } });
     if (error) { authMessage.textContent = `GitHub sign-in error: ${error.message}`; authMessage.className = 'auth-message error'; }
   });
   authForm.addEventListener('submit', async event => {
     event.preventDefault();
-    const { error } = await client.auth.signInWithOtp({ email: authEmail.value.trim(), options: { emailRedirectTo: `${window.location.origin}${window.location.pathname}` } });
+    const { error } = await client.auth.signInWithOtp({ email: authEmail.value.trim(), options: { emailRedirectTo: authRedirectUrl } });
     authMessage.textContent = error ? `Sign-in error: ${error.message}` : 'Secure link sent. Check your inbox.';
     authMessage.className = `auth-message ${error ? 'error' : 'success'}`;
     if (!error) authForm.reset();
