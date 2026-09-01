@@ -35,20 +35,19 @@ async function createCase() {
   try {
     const supabase = window.SentinelScope?.client;
     if (supabase && window.SentinelScope.session) {
-      if (!['admin', 'analyst'].includes(window.SentinelScope.profile?.role)) {
-        showStarterToast('Your account is view-only. An administrator must grant Analyst access.');
-        return;
-      }
       const caseNumber = `INC-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`;
       const { data: created, error } = await supabase.from('cases').insert({ case_number: caseNumber, title: 'New analyst investigation', severity: 'medium', status: 'new', owner_id: window.SentinelScope.session.user.id, next_step: 'Triage investigation' }).select().single();
-      if (error) throw error;
+      if (error) {
+        if (error.code === '42501') throw new Error('Case creation requires Analyst access.');
+        throw error;
+      }
       starterCases.unshift({ id: created.case_number, title: created.title, priority: created.severity, owner: 'Unassigned', next_step: created.next_step, sla: '—', status: created.status });
       renderCases(); showStarterToast(`${created.case_number} created in Supabase`); return;
     }
     const response = await fetch('/api/cases', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: 'New analyst investigation', severity: 'medium' }) });
     if (!response.ok) throw new Error('Create failed');
     const { case: created } = await response.json(); starterCases.unshift(created); renderCases(); showStarterToast(`${created.id} created and assigned to Alex Morgan`);
-  } catch { showStarterToast('Run the local Starter server to save new cases.'); }
+  } catch (error) { showStarterToast(error.message || 'Unable to save the case.'); }
   document.querySelector('#cases').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
