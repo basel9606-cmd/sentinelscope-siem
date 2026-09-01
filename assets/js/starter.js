@@ -35,8 +35,12 @@ async function createCase() {
   try {
     const supabase = window.SentinelScope?.client;
     if (supabase && window.SentinelScope.session) {
+      if (!['admin', 'analyst'].includes(window.SentinelScope.profile?.role)) {
+        showStarterToast('Your account is view-only. An administrator must grant Analyst access.');
+        return;
+      }
       const caseNumber = `INC-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`;
-      const { data: created, error } = await supabase.from('cases').insert({ case_number: caseNumber, title: 'New analyst investigation', severity: 'medium', status: 'new', next_step: 'Triage investigation' }).select().single();
+      const { data: created, error } = await supabase.from('cases').insert({ case_number: caseNumber, title: 'New analyst investigation', severity: 'medium', status: 'new', owner_id: window.SentinelScope.session.user.id, next_step: 'Triage investigation' }).select().single();
       if (error) throw error;
       starterCases.unshift({ id: created.case_number, title: created.title, priority: created.severity, owner: 'Unassigned', next_step: created.next_step, sla: '—', status: created.status });
       renderCases(); showStarterToast(`${created.case_number} created in Supabase`); return;
