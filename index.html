@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="assets/css/styles.css" />
+    <link rel="stylesheet" href="assets/css/professional.css" />
   </head>
   <body>
     <aside class="sidebar">
@@ -23,9 +24,14 @@
 
     <main>
       <header>
-        <div><p class="eyebrow">SECURITY OPERATIONS CENTER</p><h1>Threat overview</h1><p class="subhead">Monday, 31 August 2026 · Production environment</p></div>
-        <div class="header-actions"><button class="secondary" id="refreshBtn">↻ Refresh</button><button class="primary" id="newCaseBtn">+ New case</button><div class="analyst">AM</div></div>
+        <div><p class="eyebrow">SECURITY OPERATIONS CENTER <span class="live-pulse">LIVE</span></p><h1>Analyst workbench</h1><p class="subhead">Monday, 31 August 2026 · Production environment · UTC+03:00</p></div>
+        <div class="header-actions"><button class="secondary" id="refreshBtn">↻ Refresh telemetry</button><button class="primary" id="newCaseBtn">+ Open investigation</button><div class="analyst" title="Assigned analyst">AM</div></div>
       </header>
+
+      <section class="incident-banner" aria-label="Active incident summary">
+        <div class="incident-icon">!</div><div><p class="incident-label">ACTIVE INCIDENT · INC-2026-081</p><h2>Potential endpoint compromise on WS-FIN-023</h2><p>Beacon-like TLS traffic and encoded PowerShell activity observed within a 7-minute window.</p></div>
+        <div class="incident-meta"><span>Owner <b>Alex Morgan</b></span><span>SLA <b class="sla">00:18:42</b></span></div><button class="incident-cta" id="investigateBtn">Investigate incident →</button>
+      </section>
 
       <section id="overview" class="metrics" aria-label="Security metrics">
         <article class="metric-card"><p>Open alerts</p><strong id="openAlerts">0</strong><span class="trend alert-trend">↑ 18% <em>vs. last 24h</em></span></article>
@@ -43,6 +49,14 @@
 
       <section id="detections" class="bottom-grid"><article class="panel"><div class="panel-heading"><div><h2>Detection coverage</h2><p>Rules triggered in this period</p></div></div><div id="coverageList" class="coverage-list"></div></article><article id="events" class="panel"><div class="panel-heading"><div><h2>Recent normalized events</h2><p>Latest telemetry across monitored sources</p></div></div><div id="eventList" class="event-list"></div></article></section>
     </main>
+    <aside id="alertDrawer" class="alert-drawer" aria-hidden="true" aria-label="Alert investigation details">
+      <div class="drawer-head"><div><p class="eyebrow">ALERT INVESTIGATION</p><h2 id="drawerTitle">Alert details</h2><p id="drawerId" class="subhead"></p></div><button id="closeDrawer" class="drawer-close" aria-label="Close investigation">×</button></div>
+      <div class="drawer-severity"><span id="drawerSeverity" class="severity">critical</span><span id="drawerStatus" class="status">new</span><span id="drawerTime"></span></div>
+      <section class="drawer-section"><h3>Analyst assessment</h3><p id="drawerAssessment"></p></section>
+      <section class="drawer-section"><h3>Investigation context</h3><dl id="drawerContext"></dl></section>
+      <section class="drawer-section"><h3>Recommended response</h3><ol id="drawerSteps" class="response-steps"></ol></section>
+      <div class="drawer-actions"><button id="statusAction" class="primary">Start investigation</button><button id="closeAction" class="secondary">Close as resolved</button></div>
+    </aside><div id="drawerScrim" class="drawer-scrim"></div>
     <div id="toast" class="toast" role="status"></div>
     <script src="assets/js/app.js"></script>
   </body>
