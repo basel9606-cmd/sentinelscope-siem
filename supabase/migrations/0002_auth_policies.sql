@@ -58,6 +58,10 @@ $$;
 
 grant execute on function public.current_soc_profile() to authenticated;
 
+-- RLS decides which authenticated users may write; table privileges allow
+-- PostgREST to evaluate those policies for the client role.
+grant select, insert, update on public.cases to authenticated;
+
 create policy "profiles: own record" on public.profiles
 for select to authenticated using (
   id = auth.uid()
