@@ -1,0 +1,11 @@
+{
+  "id": "1748.10002",
+  "timestamp": "2026-09-02T10:15:00.000+0000",
+  "agent": {"id": "014", "name": "WIN-DC01"},
+  "rule": {
+    "level": 10,
+    "description": "Multiple Windows authentication failures",
+    "mitre": {"technique": ["Brute Force"]}
+  },
+  "data": {"srcuser": "svc-backup", "srcip": "10.10.14.37"}
+}

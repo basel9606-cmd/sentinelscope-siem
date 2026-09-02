@@ -26,7 +26,7 @@ python scripts/generate_demo_data.py
 
 ## Receive real alerts
 
-The local API can safely receive normalized webhook alerts using an ingest key. See [the production integration guide](docs/production-integration.md) and the [sample alert payload](samples/ingest-alert.json). GitHub Pages is the dashboard host only; production ingestion must run on a server or cloud function.
+The local API can safely receive normalized webhook alerts using an ingest key. See [the production integration guide](docs/production-integration.md), the [sample alert payload](samples/ingest-alert.json), and the [Wazuh connector](integrations/wazuh/README.md). GitHub Pages is the dashboard host only; production ingestion must run on a server or cloud function.
 
 ## Project structure
 
