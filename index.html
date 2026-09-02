@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="assets/css/styles.css" />
-    <link rel="stylesheet" href="assets/css/professional.css?v=20260901" />
+    <link rel="stylesheet" href="assets/css/professional.css?v=20260908" />
     <link rel="stylesheet" href="assets/css/auth.css?v=20260902" />
   </head>
   <body>
@@ -24,6 +24,7 @@
         <a class="nav-item" href="#cases"><span>▣</span> Cases <b id="caseCount">0</b></a>
         <a class="nav-item" href="#events"><span>≡</span> Event Explorer</a>
         <a class="nav-item" href="#detections"><span>⌁</span> Detections</a>
+        <a class="nav-item" href="#integrations"><span>↗</span> Integrations</a>
       </nav>
       <div class="sidebar-footer"><span class="status-dot"></span> Telemetry healthy<br /><small>Last ingest: just now</small></div>
     </aside>
@@ -55,6 +56,8 @@
 
       <section id="cases" class="panel case-panel"><div class="panel-heading"><div><p class="eyebrow">STARTER WORKFLOW</p><h2>Case management</h2><p>Track ownership, triage status, and analyst next steps in one queue.</p></div><button id="createCaseBtn" class="secondary">+ Create case</button></div><div class="case-summary"><span><b id="activeCaseMetric">0</b> active cases</span><span><b>00:18:42</b> shortest SLA</span><span><b>92%</b> response SLA met</span></div><div class="table-wrap"><table><thead><tr><th>CASE</th><th>PRIORITY</th><th>OWNER</th><th>NEXT STEP</th><th>SLA</th><th>STATUS</th></tr></thead><tbody id="caseRows"></tbody></table></div></section>
 
+      <section id="integrations" class="panel integration-panel"><div class="panel-heading"><div><p class="eyebrow">CONNECTIVITY CENTER</p><h2>Security integrations</h2><p>Connect telemetry sources without exposing credentials in the dashboard.</p></div><span id="integrationMode" class="integration-mode">Demo mode</span></div><div class="integration-grid"><article class="integration-card"><div class="integration-icon">W</div><div><h3>Wazuh connector</h3><p>Normalizes Wazuh alerts and sends them through the protected ingest API.</p></div><span class="integration-status ready">Ready</span><a href="integrations/wazuh/README.md" target="_blank" rel="noreferrer">View setup guide →</a></article><article class="integration-card"><div class="integration-icon">API</div><div><h3>Ingest API</h3><p id="apiStatus">Checking local API availability…</p></div><span id="apiStatusBadge" class="integration-status waiting">Checking</span><a href="docs/production-integration.md" target="_blank" rel="noreferrer">Production checklist →</a></article><article class="integration-card"><div class="integration-icon">DB</div><div><h3>Supabase</h3><p>Authentication, analyst roles, cases, and audit-friendly data controls.</p></div><span class="integration-status ready">Connected</span><a href="#cases">Open cases →</a></article></div><p class="integration-note">Production tip: keep ingest keys in a server-side secret manager and restrict the API to known source networks.</p></section>
+
       <section id="detections" class="bottom-grid"><article class="panel"><div class="panel-heading"><div><h2>Detection coverage</h2><p>Rules triggered in this period</p></div></div><div id="coverageList" class="coverage-list"></div></article><article id="events" class="panel"><div class="panel-heading"><div><h2>Recent normalized events</h2><p>Latest telemetry across monitored sources</p></div></div><div id="eventList" class="event-list"></div></article></section>
     </main>
     <aside id="alertDrawer" class="alert-drawer" aria-hidden="true" aria-label="Alert investigation details">
@@ -71,7 +74,7 @@
     <div id="toast" class="toast" role="status"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="assets/js/supabase-config.js?v=20260901"></script>
-    <script src="assets/js/app.js?v=20260907"></script>
+    <script src="assets/js/app.js?v=20260908"></script>
     <script src="assets/js/supabase-client.js?v=20260906"></script>
     <script src="assets/js/starter.js?v=20260905"></script>
     <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js?v=20260905');</script>
