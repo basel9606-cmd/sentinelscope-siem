@@ -26,7 +26,7 @@
         <a class="nav-item" href="#detections"><span>⌁</span> Detections</a>
         <a class="nav-item" href="#integrations"><span>↗</span> Integrations</a>
       </nav>
-      <div class="sidebar-footer"><span class="status-dot"></span> Telemetry healthy<br /><small>Last ingest: just now</small></div>
+      <div class="sidebar-footer"><span class="status-dot"></span> Telemetry healthy<br /><small id="lastIngestLabel">Checking Wazuh ingest…</small></div>
     </aside>
 
     <main>
@@ -52,7 +52,7 @@
         <article class="panel posture-panel"><div class="panel-heading"><div><h2>Security posture</h2><p>Current environment health</p></div><button class="icon-button" aria-label="More options">•••</button></div><div class="posture-score"><div class="ring"><span>78</span><small>/100</small></div><div><b>Needs attention</b><p>3 high-priority actions are pending.</p></div></div><ul class="posture-list"><li><span class="dot critical"></span><div><b>2 critical alerts</b><small>Review and contain active threats</small></div><span>›</span></li><li><span class="dot warning"></span><div><b>6 assets need patching</b><small>CVEs detected in endpoint inventory</small></div><span>›</span></li><li><span class="dot good-dot"></span><div><b>EDR coverage: 96%</b><small>192 of 200 endpoints reporting</small></div><span>›</span></li></ul></article>
       </section>
 
-      <section id="alerts" class="panel alert-panel"><div class="panel-heading"><div><h2>Priority alerts</h2><p>Detection findings requiring analyst review</p></div><a href="#events">View all events →</a></div><div class="filters"><div class="search-wrap">⌕ <input id="searchInput" type="search" placeholder="Search alerts, users, IPs…" /></div><select id="severityFilter"><option value="all">All severities</option><option value="critical">Critical</option><option value="high">High</option><option value="medium">Medium</option></select><select id="statusFilter"><option value="all">All statuses</option><option value="new">New</option><option value="investigating">Investigating</option><option value="resolved">Resolved</option></select></div><div class="table-wrap"><table><thead><tr><th>SEVERITY</th><th>ALERT</th><th>ENTITY</th><th>MITRE ATT&CK</th><th>TIME</th><th>STATUS</th><th></th></tr></thead><tbody id="alertRows"></tbody></table></div><p id="emptyState" class="empty" hidden>No alerts match the current filters.</p></section>
+      <section id="alerts" class="panel alert-panel"><div class="panel-heading"><div><h2>Priority alerts</h2><p>Live Wazuh detections requiring analyst review</p></div><a href="#events">View all events →</a></div><div class="filters"><div class="search-wrap">⌕ <input id="searchInput" type="search" placeholder="Search alerts, users, IPs…" /></div><select id="severityFilter"><option value="all">All severities</option><option value="critical">Critical</option><option value="high">High</option><option value="medium">Medium</option></select><select id="statusFilter"><option value="all">All statuses</option><option value="new">New</option><option value="investigating">Investigating</option><option value="resolved">Resolved</option></select></div><div class="table-wrap"><table><thead><tr><th>SEVERITY</th><th>ALERT</th><th>ENTITY</th><th>MITRE ATT&CK</th><th>TIME</th><th>STATUS</th><th></th></tr></thead><tbody id="alertRows"></tbody></table></div><p id="emptyState" class="empty" hidden>No live Wazuh alerts received yet.</p></section>
 
       <section id="cases" class="panel case-panel"><div class="panel-heading"><div><p class="eyebrow">STARTER WORKFLOW</p><h2>Case management</h2><p>Track ownership, triage status, and analyst next steps in one queue.</p></div><button id="createCaseBtn" class="secondary">+ Create case</button></div><div class="case-summary"><span><b id="activeCaseMetric">0</b> active cases</span><span><b>00:18:42</b> shortest SLA</span><span><b>92%</b> response SLA met</span></div><div class="table-wrap"><table><thead><tr><th>CASE</th><th>PRIORITY</th><th>OWNER</th><th>NEXT STEP</th><th>SLA</th><th>STATUS</th></tr></thead><tbody id="caseRows"></tbody></table></div></section>
 
@@ -74,9 +74,9 @@
     <div id="toast" class="toast" role="status"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="assets/js/supabase-config.js?v=20260901"></script>
-    <script src="assets/js/app.js?v=20260908"></script>
+    <script src="assets/js/app.js?v=20260909"></script>
     <script src="assets/js/supabase-client.js?v=20260906"></script>
     <script src="assets/js/starter.js?v=20260905"></script>
-    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js?v=20260905');</script>
+    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js?v=20260909');</script>
   </body>
 </html>

@@ -106,6 +106,19 @@ def get_alerts(limit: int = 100) -> list[dict]:
     return [dict(row) for row in rows]
 
 
+def get_ingest_health() -> dict:
+    with sqlite3.connect(DATABASE) as connection:
+        count, last_ingest = connection.execute(
+            "SELECT COUNT(*), MAX(observed_at) FROM alerts"
+        ).fetchone()
+    return {
+        "status": "ok",
+        "ingest_configured": bool(INGEST_KEY),
+        "alert_count": count,
+        "last_ingest_at": last_ingest,
+    }
+
+
 def normalise_alert(item: dict) -> dict:
     if not isinstance(item, dict):
         raise ValueError("Each alert must be an object")
@@ -159,7 +172,7 @@ class SentinelHandler(SimpleHTTPRequestHandler):
     def do_GET(self) -> None:
         path = urlparse(self.path).path
         if path == "/api/health":
-            self._json(HTTPStatus.OK, {"status": "ok", "ingest_configured": bool(INGEST_KEY)})
+            self._json(HTTPStatus.OK, get_ingest_health())
             return
         if path == "/api/alerts":
             self._json(HTTPStatus.OK, {"alerts": get_alerts()})

@@ -1,0 +1,22 @@
+[Unit]
+Description=SentinelScope Wazuh alerts collector
+After=network-online.target wazuh-manager.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=wazuh
+EnvironmentFile=/etc/sentinelscope/wazuh-collector.env
+ExecStart=/usr/bin/python3 /opt/sentinelscope-wazuh/alerts_tail.py --file /var/ossec/logs/alerts/alerts.json --state-file /var/ossec/queue/sentinelscope-alerts.offset
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadOnlyPaths=/var/ossec/logs/alerts
+ReadWritePaths=/var/ossec/queue
+
+[Install]
+WantedBy=multi-user.target

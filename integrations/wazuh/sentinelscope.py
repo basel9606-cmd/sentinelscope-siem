@@ -8,6 +8,7 @@ environment. Never place secrets in this file.
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import sys
 from datetime import datetime, timezone
@@ -32,10 +33,21 @@ def normalise(wazuh_alert: dict) -> dict:
     data = wazuh_alert.get("data") or {}
     entity = agent.get("name") or data.get("srcuser") or data.get("srcip") or "unknown-asset"
     mitre = rule.get("mitre") or {}
+    technique_ids = mitre.get("id") if isinstance(mitre, dict) else None
     techniques = mitre.get("technique") if isinstance(mitre, dict) else None
-    technique = techniques[0] if isinstance(techniques, list) and techniques else ""
+    technique = (
+        technique_ids[0]
+        if isinstance(technique_ids, list) and technique_ids
+        else techniques[0]
+        if isinstance(techniques, list) and techniques
+        else ""
+    )
+    external_id = str(wazuh_alert.get("id") or "").strip()
+    if not external_id:
+        encoded = json.dumps(wazuh_alert, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+        external_id = hashlib.sha256(encoded).hexdigest()[:24]
     return {
-        "id": f"wazuh-{wazuh_alert.get('id', '')}",
+        "id": f"wazuh-{external_id}",
         "rule_name": rule.get("description") or "Wazuh detection",
         "severity": severity_for(rule.get("level")),
         "mitre_technique": technique,
@@ -46,28 +58,33 @@ def normalise(wazuh_alert: dict) -> dict:
     }
 
 
+def post_alerts(alerts: list[dict], *, timeout: int = 10) -> dict:
+    """Deliver a normalized alert batch to the protected SentinelScope API."""
+    ingest_url = os.environ.get("SENTINELSCOPE_INGEST_URL", "").rstrip("/")
+    ingest_key = os.environ.get("SENTINELSCOPE_INGEST_KEY", "")
+    if not ingest_url or not ingest_key:
+        raise RuntimeError("SENTINELSCOPE_INGEST_URL and SENTINELSCOPE_INGEST_KEY are required")
+    request = Request(
+        f"{ingest_url}/api/ingest",
+        data=json.dumps({"alerts": alerts}).encode("utf-8"),
+        headers={"Content-Type": "application/json", "X-Ingest-Key": ingest_key},
+        method="POST",
+    )
+    with urlopen(request, timeout=timeout) as response:
+        body = response.read()
+    return json.loads(body or b"{}")
+
+
 def main() -> int:
     if len(sys.argv) != 2:
         print("Usage: sentinelscope.py /path/to/wazuh-alert.json", file=sys.stderr)
         return 2
-    ingest_url = os.environ.get("SENTINELSCOPE_INGEST_URL", "").rstrip("/")
-    ingest_key = os.environ.get("SENTINELSCOPE_INGEST_KEY", "")
-    if not ingest_url or not ingest_key:
-        print("SENTINELSCOPE_INGEST_URL and SENTINELSCOPE_INGEST_KEY are required", file=sys.stderr)
-        return 2
     with open(sys.argv[1], encoding="utf-8") as source:
-        payload = {"alerts": [normalise(json.load(source))]}
-    request = Request(
-        f"{ingest_url}/api/ingest",
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json", "X-Ingest-Key": ingest_key},
-        method="POST",
-    )
+        alerts = [normalise(json.load(source))]
     try:
-        with urlopen(request, timeout=10) as response:
-            response.read()
+        post_alerts(alerts)
         return 0
-    except (HTTPError, URLError) as error:
+    except (HTTPError, URLError, RuntimeError) as error:
         print(f"SentinelScope delivery failed: {error}", file=sys.stderr)
         return 1
 
