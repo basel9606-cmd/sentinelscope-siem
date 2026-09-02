@@ -33,8 +33,8 @@
     analystBadge.title = `Signed in as ${email}`;
     clearAuthHash();
 
-    const { data } = await client.from('profiles').select('display_name, role').eq('id', session.user.id).maybeSingle();
-    window.SentinelScope.profile = data || { display_name: email, role: 'viewer' };
+    const { data } = await client.rpc('current_soc_profile');
+    window.SentinelScope.profile = data?.[0] || { display_name: email, role: 'viewer' };
     analystBadge.title = `${window.SentinelScope.profile.display_name} · ${window.SentinelScope.profile.role}`;
   }
 

@@ -33,12 +33,36 @@ set search_path = public
 as $$
   select exists (
     select 1 from public.profiles
-    where id = auth.uid() and role in ('admin', 'analyst')
+    where role in ('admin', 'analyst')
+      and (
+        id = auth.uid()
+        or lower(email) = lower(coalesce(auth.jwt() ->> 'email', ''))
+      )
   );
 $$;
 
+create or replace function public.current_soc_profile()
+returns table(display_name text, role text)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select p.display_name, p.role
+  from public.profiles p
+  where p.id = auth.uid()
+     or lower(p.email) = lower(coalesce(auth.jwt() ->> 'email', ''))
+  order by (p.id = auth.uid()) desc
+  limit 1;
+$$;
+
+grant execute on function public.current_soc_profile() to authenticated;
+
 create policy "profiles: own record" on public.profiles
-for select to authenticated using (id = auth.uid());
+for select to authenticated using (
+  id = auth.uid()
+  or lower(email) = lower(coalesce(auth.jwt() ->> 'email', ''))
+);
 
 create policy "profiles: own update" on public.profiles
 for update to authenticated using (id = auth.uid()) with check (id = auth.uid());
