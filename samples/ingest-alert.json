@@ -1,0 +1,14 @@
+{
+  "alerts": [
+    {
+      "id": "wazuh-100021",
+      "rule_name": "Multiple failed logons followed by success",
+      "severity": "high",
+      "mitre_technique": "T1110",
+      "entity": "svc-backup",
+      "source": "Wazuh / Windows Security",
+      "observed_at": "2026-09-02T10:15:00Z",
+      "raw_event": {"event_id": 4625, "host": "WIN-DC01", "source_ip": "10.10.14.37"}
+    }
+  ]
+}

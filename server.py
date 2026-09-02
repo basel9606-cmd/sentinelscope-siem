@@ -2,6 +2,9 @@
 from __future__ import annotations
 
 import json
+import hashlib
+import hmac
+import os
 import sqlite3
 import uuid
 from datetime import datetime, timezone
@@ -12,6 +15,9 @@ from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parent
 DATABASE = ROOT / "data" / "sentinelscope.db"
+INGEST_KEY = os.environ.get("SENTINELSCOPE_INGEST_KEY", "")
+MAX_BODY_BYTES = 256_000
+VALID_SEVERITIES = {"critical", "high", "medium", "low"}
 
 
 def get_cases() -> list[dict]:
@@ -89,6 +95,58 @@ def add_note(case_id: str, payload: dict) -> dict | None:
     return get_case_notes(case_id)[0]
 
 
+def get_alerts(limit: int = 100) -> list[dict]:
+    with sqlite3.connect(DATABASE) as connection:
+        connection.row_factory = sqlite3.Row
+        rows = connection.execute(
+            """SELECT id, rule_name, severity, mitre_technique, entity, source, observed_at
+               FROM alerts ORDER BY observed_at DESC LIMIT ?""",
+            (max(1, min(limit, 500)),),
+        ).fetchall()
+    return [dict(row) for row in rows]
+
+
+def normalise_alert(item: dict) -> dict:
+    if not isinstance(item, dict):
+        raise ValueError("Each alert must be an object")
+    rule_name = str(item.get("rule_name", "")).strip()[:240]
+    entity = str(item.get("entity", "")).strip()[:240]
+    source = str(item.get("source", "")).strip()[:120]
+    severity = str(item.get("severity", "medium")).lower()
+    if not rule_name or not entity or not source:
+        raise ValueError("rule_name, entity, and source are required")
+    if severity not in VALID_SEVERITIES:
+        raise ValueError("severity must be critical, high, medium, or low")
+    observed_at = str(item.get("observed_at") or datetime.now(timezone.utc).isoformat()).strip()
+    mitre = str(item.get("mitre_technique", "")).strip()[:64] or None
+    raw_event = item.get("raw_event", item)
+    raw_json = json.dumps(raw_event, separators=(",", ":"), ensure_ascii=False)
+    fingerprint = json.dumps({"rule_name": rule_name, "entity": entity, "source": source, "observed_at": observed_at}, sort_keys=True)
+    alert_id = str(item.get("id") or f"ing-{hashlib.sha256(fingerprint.encode()).hexdigest()[:20]}")[:80]
+    return {"id": alert_id, "rule_name": rule_name, "severity": severity, "mitre": mitre, "entity": entity, "source": source, "observed_at": observed_at, "raw_json": raw_json}
+
+
+def ingest_alerts(payload: dict) -> dict:
+    items = payload.get("alerts", [payload]) if isinstance(payload, dict) else []
+    if not isinstance(items, list) or not items or len(items) > 100:
+        raise ValueError("Provide between 1 and 100 alerts")
+    alerts = [normalise_alert(item) for item in items]
+    with sqlite3.connect(DATABASE) as connection:
+        for alert in alerts:
+            connection.execute(
+                """INSERT INTO alerts (id, rule_name, severity, mitre_technique, entity, source, observed_at, raw_event_json)
+                   VALUES (:id, :rule_name, :severity, :mitre, :entity, :source, :observed_at, :raw_json)
+                   ON CONFLICT(id) DO UPDATE SET severity = excluded.severity, observed_at = excluded.observed_at,
+                     raw_event_json = excluded.raw_event_json""",
+                alert,
+            )
+            connection.execute(
+                "INSERT INTO audit_log (id, action, detail_json) VALUES (?, ?, ?)",
+                (str(uuid.uuid4()), "alert.ingested", json.dumps({"alert_id": alert["id"], "source": alert["source"]})),
+            )
+    return {"accepted": len(alerts), "alert_ids": [alert["id"] for alert in alerts]}
+
+
 class SentinelHandler(SimpleHTTPRequestHandler):
     def _json(self, status: HTTPStatus, body: object) -> None:
         data = json.dumps(body).encode("utf-8")
@@ -100,6 +158,12 @@ class SentinelHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self) -> None:
         path = urlparse(self.path).path
+        if path == "/api/health":
+            self._json(HTTPStatus.OK, {"status": "ok", "ingest_configured": bool(INGEST_KEY)})
+            return
+        if path == "/api/alerts":
+            self._json(HTTPStatus.OK, {"alerts": get_alerts()})
+            return
         if path == "/api/cases":
             self._json(HTTPStatus.OK, {"cases": get_cases()})
             return
@@ -111,9 +175,18 @@ class SentinelHandler(SimpleHTTPRequestHandler):
     def do_POST(self) -> None:
         try:
             size = int(self.headers.get("Content-Length", "0"))
+            if size < 1 or size > MAX_BODY_BYTES:
+                self._json(HTTPStatus.REQUEST_ENTITY_TOO_LARGE, {"error": "Payload must be between 1 and 256000 bytes"})
+                return
             payload = json.loads(self.rfile.read(size) or b"{}")
             path = urlparse(self.path).path
-            if path == "/api/cases":
+            if path == "/api/ingest":
+                supplied_key = self.headers.get("X-Ingest-Key", "")
+                if not INGEST_KEY or not hmac.compare_digest(supplied_key, INGEST_KEY):
+                    self._json(HTTPStatus.UNAUTHORIZED, {"error": "Invalid ingest key"})
+                    return
+                self._json(HTTPStatus.ACCEPTED, ingest_alerts(payload))
+            elif path == "/api/cases":
                 self._json(HTTPStatus.CREATED, {"case": create_case(payload)})
             elif path.startswith("/api/cases/") and path.endswith("/notes"):
                 note = add_note(path.split("/")[3], payload)
@@ -137,6 +210,6 @@ class SentinelHandler(SimpleHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    address = ("127.0.0.1", 8000)
+    address = ("127.0.0.1", int(os.environ.get("PORT", "8000")))
     print(f"SentinelScope Starter is running at http://{address[0]}:{address[1]}")
     ThreadingHTTPServer(address, SentinelHandler).serve_forever()
